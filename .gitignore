@@ -1,0 +1,11 @@
+*.iml
+*.png
+*.jpg
+*.class
+
+
+
+.idea/
+**/target/
+dist/
+.cache
