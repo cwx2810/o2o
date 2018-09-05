@@ -50,7 +50,7 @@ public class ImageUtil {
      * 产生随机文件名，由日期+5个随机数组成
      * @return
      */
-    private static String getRandomFileName() {
+    public static String getRandomFileName() {
         String nowTimeStr = SIMPLE_DATE_FORMAT.format(new Date());
         int randomNum = RANDOM.nextInt(89999) + 10000;
         return nowTimeStr + randomNum;
