@@ -118,35 +118,25 @@ public class ShopManagementController {
         if (shop != null && shopImg != null) {
             // shop拥有人是不需要前端传的，在session中，因此我们直接new了
             PersonInfo personInfo = new PersonInfo();
+            // Session TODO
             personInfo.setUserId(1L);
             shop.setOwner(personInfo);
 
-            // 新建一个文件
-            File file = new File(PathUtil.getImgBasePath() + ImageUtil.getRandomFileName());
+            // 将shop信息和文件添加到结果集进行判断
+            ShopExecution shopExecution;
             try {
-                file.createNewFile();
-            } catch (IOException e) {
-                modelMap.put("success", false);
-                modelMap.put("errMsg", e.getMessage());
-                return modelMap;
-            }
-            try {
-                // 将图片输入流转换为这个文件
-                inputStreamToFile(shopImg.getInputStream(), file);
-            } catch (IOException e) {
-                modelMap.put("success", false);
-                modelMap.put("errMsg", e.getMessage());
-                return modelMap;
-            }
+                shopExecution = shopService.addShop(shop, shopImg.getInputStream(), shopImg.getOriginalFilename());
 
-            // 将shop信息和文件添加到结果集
-            ShopExecution shopExecution = shopService.addShop(shop, file);
-            // 如果结果集的状态是待审核，则添加成功，否则不成功，返回状态解释
-            if (shopExecution.getState() == ShopStateEnum.CHECK.getState()) {
-                modelMap.put("success", true);
-            } else {
+                // 如果结果集的状态是待审核，则添加成功
+                if (shopExecution.getState() == ShopStateEnum.CHECK.getState()) {
+                    modelMap.put("success", true);
+                } else {// 否则不成功，返回状态解释
+                    modelMap.put("success", false);
+                    modelMap.put("errMsg", shopExecution.getStateInfo());
+                }
+            } catch (Exception e) {
                 modelMap.put("success", false);
-                modelMap.put("errMsg", shopExecution.getStateInfo());
+                modelMap.put("errMsg", e.getMessage());
             }
 
             // 最终返回结果
@@ -163,32 +153,32 @@ public class ShopManagementController {
      * @param inputStream
      * @param file
      */
-    private static void inputStreamToFile(InputStream inputStream, File file) {
-        FileOutputStream fileOutputStream = null;
-        try {
-            // 不管输入的流是什么类型，输出的流是file类型的
-            fileOutputStream = new FileOutputStream(file);
-            // input的字节个数，初始化为0
-            int bytesRead = 0;
-            // 读取的字节存放在buffer中
-            byte[] buffer = new byte[1024];
-            // buffer中input的字节没有output完（!=-1）就一直output
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                fileOutputStream.write(buffer, 0, bytesRead);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("调用输入流转换文件函数发生异常：" + e.getMessage());
-        } finally {// 用完了关闭流
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (fileOutputStream != null) {
-                    fileOutputStream.close();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("关闭流产生异常：" + e.getMessage());
-            }
-        }
-    }
+//    private static void inputStreamToFile(InputStream inputStream, File file) {
+//        FileOutputStream fileOutputStream = null;
+//        try {
+//            // 不管输入的流是什么类型，输出的流是file类型的
+//            fileOutputStream = new FileOutputStream(file);
+//            // input的字节个数，初始化为0
+//            int bytesRead = 0;
+//            // 读取的字节存放在buffer中
+//            byte[] buffer = new byte[1024];
+//            // buffer中input的字节没有output完（!=-1）就一直output
+//            while ((bytesRead = inputStream.read(buffer)) != -1) {
+//                fileOutputStream.write(buffer, 0, bytesRead);
+//            }
+//        } catch (Exception e) {
+//            throw new RuntimeException("调用输入流转换文件函数发生异常：" + e.getMessage());
+//        } finally {// 用完了关闭流
+//            try {
+//                if (inputStream != null) {
+//                    inputStream.close();
+//                }
+//                if (fileOutputStream != null) {
+//                    fileOutputStream.close();
+//                }
+//            } catch (IOException e) {
+//                throw new RuntimeException("关闭流产生异常：" + e.getMessage());
+//            }
+//        }
+//    }
 }

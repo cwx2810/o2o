@@ -4,6 +4,7 @@ import net.coobird.thumbnailator.Thumbnails;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -24,26 +25,27 @@ public class ImageUtil {
 
     /**
      * 生成缩略图
-     * @param thumbnail spring传入的图片文件
+     * @param thumbnailInputStream spring传入的图片文件
+     * @param fileName 图片的名称
      * @param targetAddress 图片保存地址，是服务器图片目录之后的地址，
      *                      也就是设置好服务器图片目录，我们这个是此目录下的相对路径
      * @return
      */
-    public static String generateThumbnail(File thumbnail, String targetAddress) throws IOException {
-        String fileName = getRandomFileName();
-        String extensionName = getExtensionName(thumbnail);
+    public static String generateThumbnail(InputStream thumbnailInputStream, String fileName, String targetAddress) throws IOException {
+        String realFileName = getRandomFileName();
+        String extensionName = getExtensionName(fileName);
         makeDirPath(targetAddress);
-        System.out.println("打印相对路径：" + targetAddress + fileName + extensionName);
+        System.out.println("打印相对路径：" + targetAddress + realFileName + extensionName);
 
         // 图片文件最终存储地址
-        File dest = new File(PathUtil.getImgBasePath() + targetAddress + fileName + extensionName);
-        System.out.println("打印绝对路径：" + PathUtil.getImgBasePath() + targetAddress + fileName + extensionName);
+        File dest = new File(PathUtil.getImgBasePath() + targetAddress + realFileName + extensionName);
+        System.out.println("打印绝对路径：" + PathUtil.getImgBasePath() + targetAddress + realFileName + extensionName);
         System.out.println("打印类加载路径：" + bathPath);
-        Thumbnails.of(thumbnail)
+        Thumbnails.of(thumbnailInputStream)
                 .size(200, 200)
                 .outputQuality(0.8f)
                 .toFile(dest);
-        return targetAddress + fileName + extensionName;
+        return targetAddress + realFileName + extensionName;
     }
 
     /**
@@ -60,10 +62,9 @@ public class ImageUtil {
      * 获得图片扩展名
      * @return
      */
-    private static String getExtensionName(File thumbnail) {
-        String originalFileName = thumbnail.getName();
+    private static String getExtensionName(String fileName) {
         // 获取点号之后的字符
-        return originalFileName.substring(originalFileName.indexOf("."));
+        return fileName.substring(fileName.indexOf("."));
     }
 
     /**

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 /**
@@ -29,12 +30,12 @@ public class ShopServiceImpl implements ShopService {
     /**
      * 添加店铺
      * @param shop
-     * @param shopImg
+     * @param shopImgInputStream
      * @return
      */
     @Override
     @Transactional
-    public ShopExecution addShop(Shop shop, File shopImg) {
+    public ShopExecution addShop(Shop shop, InputStream shopImgInputStream, String fileName) {
         // 空值判断
         if (shop == null) {
             return new ShopExecution(ShopStateEnum.NULL_SHOP);
@@ -52,10 +53,10 @@ public class ShopServiceImpl implements ShopService {
                 throw new ShopOperationException("插入店铺信息失败");
             } else {
                 // 店铺创建成功后，检查传入的图片参数是否存在，存储图片
-                if (shopImg != null) {
+                if (shopImgInputStream != null) {
                     try {
                         // 有图片，则添加图片
-                        addShopImg(shop, shopImg);
+                        addShopImg(shop, shopImgInputStream, fileName);
                     } catch (Exception e) {
                         throw new ShopOperationException("添加图片失败：" + e.getMessage());
                     }
@@ -76,11 +77,14 @@ public class ShopServiceImpl implements ShopService {
 
     /**
      * 店铺创建成功后插入图片
-     * @param shopImg
+     * @param shop
+     * @param shopImgInputStream
+     * @param fileName
+     * @throws IOException
      */
-    private void addShopImg(Shop shop, File shopImg) throws IOException {
+    private void addShopImg(Shop shop, InputStream shopImgInputStream, String fileName) throws IOException {
         String targetAddress = PathUtil.getShopImgPath(shop.getShopId());
-        String relativeAddress = ImageUtil.generateThumbnail(shopImg, targetAddress);
+        String relativeAddress = ImageUtil.generateThumbnail(shopImgInputStream, fileName, targetAddress);
         shop.setShopImg(relativeAddress);
     }
 }

@@ -11,6 +11,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +28,7 @@ public class ShopServiceTest extends BaseTest {
     private ShopService shopService;
 
     @Test
-    public void testAddShop() {
+    public void testAddShop() throws FileNotFoundException {
         Shop shop = new Shop();
 
         // 读取3个对象实例
@@ -39,18 +42,20 @@ public class ShopServiceTest extends BaseTest {
         shop.setOwner(personInfo);
         shop.setArea(area);
         shop.setShopCategory(shopCategory);
-        shop.setShopName("测试添加店铺");
-        shop.setShopDesc("addTest");
-        shop.setShopAddr("addTest");
-        shop.setShopImg("addTest");
+        shop.setShopName("测试添加店铺再次");
+        shop.setShopDesc("addTest111");
+        shop.setShopAddr("addTest111");
+        shop.setShopImg("addTest111");
         shop.setPhone("1234567");
-        shop.setPriority(2);
+        shop.setPriority(3);
         shop.setEnableStatus(ShopStateEnum.CHECK.getState());
         shop.setAdvice("审核中");
         shop.setCreateTime(new Date());
 
         File shopImg = new File("C:/images/test.jpg");
-        ShopExecution shopExecution = shopService.addShop(shop, shopImg);
+
+        InputStream fileInputStream = new FileInputStream(shopImg);
+        ShopExecution shopExecution = shopService.addShop(shop, fileInputStream, shopImg.getName());
 
         assertEquals(ShopStateEnum.CHECK.getState(), shopExecution.getState());
     }
