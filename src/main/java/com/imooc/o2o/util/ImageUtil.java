@@ -1,7 +1,6 @@
 package com.imooc.o2o.util;
 
 import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +21,7 @@ public class ImageUtil {
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
     private static final Random RANDOM = new Random();
 
+
     /**
      * 生成缩略图
      * @param thumbnail spring传入的图片文件
@@ -29,14 +29,17 @@ public class ImageUtil {
      *                      也就是设置好服务器图片目录，我们这个是此目录下的相对路径
      * @return
      */
-    public static String generateThumbnail(CommonsMultipartFile thumbnail, String targetAddress) throws IOException {
+    public static String generateThumbnail(File thumbnail, String targetAddress) throws IOException {
         String fileName = getRandomFileName();
         String extensionName = getExtensionName(thumbnail);
         makeDirPath(targetAddress);
+        System.out.println("打印相对路径：" + targetAddress + fileName + extensionName);
+
         // 图片文件最终存储地址
         File dest = new File(PathUtil.getImgBasePath() + targetAddress + fileName + extensionName);
-
-        Thumbnails.of(thumbnail.getInputStream())
+        System.out.println("打印绝对路径：" + PathUtil.getImgBasePath() + targetAddress + fileName + extensionName);
+        System.out.println("打印类加载路径：" + bathPath);
+        Thumbnails.of(thumbnail)
                 .size(200, 200)
                 .outputQuality(0.8f)
                 .toFile(dest);
@@ -57,8 +60,8 @@ public class ImageUtil {
      * 获得图片扩展名
      * @return
      */
-    private static String getExtensionName(CommonsMultipartFile thumbnail) {
-        String originalFileName = thumbnail.getOriginalFilename();
+    private static String getExtensionName(File thumbnail) {
+        String originalFileName = thumbnail.getName();
         // 获取点号之后的字符
         return originalFileName.substring(originalFileName.indexOf("."));
     }

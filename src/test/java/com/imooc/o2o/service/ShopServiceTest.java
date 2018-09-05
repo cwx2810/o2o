@@ -1,28 +1,31 @@
-package com.imooc.o2o.dao;
+package com.imooc.o2o.service;
 
 import com.imooc.o2o.BaseTest;
+import com.imooc.o2o.dto.ShopExecution;
 import com.imooc.o2o.entity.Area;
 import com.imooc.o2o.entity.PersonInfo;
 import com.imooc.o2o.entity.Shop;
 import com.imooc.o2o.entity.ShopCategory;
+import com.imooc.o2o.enums.ShopStateEnum;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author: LieutenantChen
- * @create: 2018-09-04 10:00
+ * @create: 2018-09-05 11:32
  **/
-public class ShopDaoTest extends BaseTest {
+public class ShopServiceTest extends BaseTest {
 
     @Autowired
-    private ShopDao shopDao;
+    private ShopService shopService;
 
     @Test
-    public void testInsertShop() {
+    public void testAddShop() {
         Shop shop = new Shop();
 
         // 读取3个对象实例
@@ -36,28 +39,19 @@ public class ShopDaoTest extends BaseTest {
         shop.setOwner(personInfo);
         shop.setArea(area);
         shop.setShopCategory(shopCategory);
-        shop.setShopName("测试店铺2");
-        shop.setShopDesc("test2");
-        shop.setShopAddr("test2");
-        shop.setShopImg("test2");
+        shop.setShopName("测试添加店铺");
+        shop.setShopDesc("addTest");
+        shop.setShopAddr("addTest");
+        shop.setShopImg("addTest");
         shop.setPhone("1234567");
-        shop.setPriority(1);
-        shop.setEnableStatus(1);
+        shop.setPriority(2);
+        shop.setEnableStatus(ShopStateEnum.CHECK.getState());
         shop.setAdvice("审核中");
         shop.setCreateTime(new Date());
 
-        int effectedNum = shopDao.insertShop(shop);
-        assertEquals(1, effectedNum);
-    }
+        File shopImg = new File("C:/images/test.jpg");
+        ShopExecution shopExecution = shopService.addShop(shop, shopImg);
 
-    @Test
-    public void testUpdateShop() {
-        Shop shop = new Shop();
-        shop.setShopId(1L);
-        shop.setShopDesc("测试更改描述");
-        shop.setShopAddr("测试更改地址");
-        shop.setLastEditTime(new Date());
-        int effectedNum = shopDao.updateShop(shop);
-        assertEquals(1, effectedNum);
+        assertEquals(ShopStateEnum.CHECK.getState(), shopExecution.getState());
     }
 }
