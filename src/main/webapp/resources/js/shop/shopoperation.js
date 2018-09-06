@@ -6,7 +6,7 @@ $(function () {
     var registerShopUrl = '/o2o/shopadmin/registershop';
 
     //调试信息，提示我们已经在调取后台信息了，以免我么前台html地址写错了找不到错在哪里
-    alert(initUrl);
+    //alert(initUrl);
 
     // 页面一加载就调用这个方法
     getShopInitInfo();
@@ -55,7 +55,7 @@ $(function () {
             formData.append('shopStr', JSON.stringify(shop));
 
             // 声明验证码控件
-            var verifyCodeActual = $('#j_captcha').val();
+            var verifyCodeActual = $('#j-kaptcha').val();
             // 如果验证码为空，则提示需要输入验证码
             if (!verifyCodeActual) {
                 $.toast('请输入验证码！');
@@ -80,7 +80,7 @@ $(function () {
                         $.toast('提交失败！' + data.errMsg);
                     }
                     // 不管提交成功失败都更新验证码
-                    $('#captcha_img').click();
+                    $('#kaptcha-img').click();
                 }
             });
 
