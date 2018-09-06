@@ -8,6 +8,12 @@ import com.imooc.o2o.entity.Shop;
  **/
 public interface ShopDao {
     /**
+     * 通过shopId查询shop
+     * @param shopId
+     * @return shop
+     */
+    Shop queryByShopId(long shopId);
+    /**
      * 新增店铺
      * @param shop
      * @return 1插入成功，-1插入失败
