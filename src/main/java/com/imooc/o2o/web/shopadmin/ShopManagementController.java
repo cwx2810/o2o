@@ -43,6 +43,36 @@ public class ShopManagementController {
     private AreaService areaService;
 
     /**
+     * 获取店铺，根据店铺id
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/getshopbyid", method = RequestMethod.GET)
+    @ResponseBody
+    private Map<String, Object> getShopById(HttpServletRequest httpServletRequest) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        // 用我们写好的方法，从请求中获取shopId
+        Long shopId = HttpServletRequestUtil.getLong(httpServletRequest, "shopId");
+        if (shopId > -1) {
+            try {
+                // 通过shopId获取shop信息，还要获取区域列表显示在前台
+                Shop shop = shopService.getByShopId(shopId);
+                List<Area> areaList = areaService.getAreaList();
+                modelMap.put("shop", shop);
+                modelMap.put("areaList", areaList);
+                modelMap.put("success", true);
+            } catch (Exception e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.getMessage());
+            }
+        } else {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "shopId为空");
+        }
+        return modelMap;
+    }
+
+    /**
      * 获取店铺所属类别和区域信息
      * @return 从后台获取数据给modelMap，前台从modelMap读取信息显示下拉列表
      */
@@ -121,10 +151,8 @@ public class ShopManagementController {
          * 2.注册店铺
          */
         if (shop != null && shopImg != null) {
-            // shop拥有人是不需要前端传的，在session中，因此我们直接new了
-            PersonInfo personInfo = new PersonInfo();
-            // Session TODO
-            personInfo.setUserId(1L);
+            // shop拥有人是不需要前端传的，在session中
+            PersonInfo personInfo = (PersonInfo)httpServletRequest.getSession().getAttribute("user");
             shop.setOwner(personInfo);
 
             // 将shop信息和文件添加到结果集进行判断
@@ -134,6 +162,99 @@ public class ShopManagementController {
 
                 // 如果结果集的状态是待审核，则添加成功
                 if (shopExecution.getState() == ShopStateEnum.CHECK.getState()) {
+                    modelMap.put("success", true);
+                    // 添加成功后，我们要维护一个session列表，保存该owner可以操作的店铺
+                    @SuppressWarnings("unchecked")
+                    List<Shop> shopList = (List<Shop>)httpServletRequest.getSession().getAttribute("shopList");
+                    if (shopList == null || shopList.size() == 0) {
+                        shopList = new ArrayList<Shop>();
+                    }
+                    shopList.add(shopExecution.getShop());
+                    httpServletRequest.getSession().setAttribute("shopList", shopList);
+
+                } else {// 否则添加不成功，返回状态解释
+                    modelMap.put("success", false);
+                    modelMap.put("errMsg", shopExecution.getStateInfo());
+                }
+            } catch (Exception e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.getMessage());
+            }
+
+            // 最终返回结果
+            return modelMap;
+        } else {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "店铺信息为空");
+            return modelMap;
+        }
+    }
+
+    /**
+     * 更新店铺
+     * @param httpServletRequest
+     * @return 前台提交表单给后台
+     */
+    @RequestMapping(value = "/modifyshop", method = RequestMethod.POST)
+    @ResponseBody
+    private Map<String, Object> modifyShop(HttpServletRequest httpServletRequest) {
+
+        /**
+         * 1.接收浏览器请求，转换提交上来的shop和img信息为对象，给shop实体类
+         */
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+
+        // 验证码
+        if (!CodeUtil.checkVerifyCode(httpServletRequest)) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "输入了错误的验证码");
+            return modelMap;
+        }
+
+        // 接收String
+        String shopStr = HttpServletRequestUtil.getString(httpServletRequest, "shopStr");
+        // 用fastjson把前端传过来的shopStr转换成shop对象
+        ObjectMapper objectMapper = new ObjectMapper();
+        Shop shop = null;
+        try {
+            // 转换成shop对象
+            shop = objectMapper.readValue(shopStr, Shop.class);
+        } catch (Exception e) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", e.toString());
+            return modelMap;
+        }
+
+        // 接收图片
+        CommonsMultipartFile shopImg = null;
+        // 获取请求中session中的上下文，用来获取上传的文件流
+        CommonsMultipartResolver commonsMultipartResolver =
+                new CommonsMultipartResolver(httpServletRequest.getSession().getServletContext());
+        // 如果有上传的文件流，就把文件流强制转换为multipart对象，因为这个对象可以让我们提取文件
+        if (commonsMultipartResolver.isMultipart(httpServletRequest)) {
+            MultipartHttpServletRequest multipartHttpServletRequest =
+                    (MultipartHttpServletRequest) httpServletRequest;
+            // 提取前端传过来的shopImg
+            shopImg = (CommonsMultipartFile) multipartHttpServletRequest.getFile("shopImg");
+        }
+
+        /**
+         * 2.更新店铺
+         */
+        if (shop != null && shop.getShopId() != null) {
+
+            // 将shop信息和文件添加到结果集进行判断
+            ShopExecution shopExecution;
+            try {
+                // 传入的图片为空也行，因为是修改，我们可以不用改图片
+                if (shopImg == null) {
+                    shopExecution = shopService.modifyShop(shop, null, null);
+                } else {
+                    shopExecution = shopService.modifyShop(shop, shopImg.getInputStream(), shopImg.getOriginalFilename());
+                }
+
+                // 如果结果集的状态是待审核，则添加成功
+                if (shopExecution.getState() == ShopStateEnum.SUCCESS.getState()) {
                     modelMap.put("success", true);
                 } else {// 否则不成功，返回状态解释
                     modelMap.put("success", false);
@@ -148,7 +269,7 @@ public class ShopManagementController {
             return modelMap;
         } else {
             modelMap.put("success", false);
-            modelMap.put("errMsg", "店铺信息为空");
+            modelMap.put("errMsg", "shopId为空");
             return modelMap;
         }
     }
