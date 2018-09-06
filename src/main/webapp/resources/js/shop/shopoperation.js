@@ -53,6 +53,16 @@ $(function () {
             var formData = new FormData();
             formData.append('shopImg', shopImg);
             formData.append('shopStr', JSON.stringify(shop));
+
+            // 声明验证码控件
+            var verifyCodeActual = $('#j_captcha').val();
+            // 如果验证码为空，则提示需要输入验证码
+            if (!verifyCodeActual) {
+                $.toast('请输入验证码！');
+                return;
+            }
+            formData.append("verifyCodeActual", verifyCodeActual);
+
             //提交
             $.ajax({
                 url : registerShopUrl,
@@ -69,6 +79,8 @@ $(function () {
                     } else {
                         $.toast('提交失败！' + data.errMsg);
                     }
+                    // 不管提交成功失败都更新验证码
+                    $('#captcha_img').click();
                 }
             });
 

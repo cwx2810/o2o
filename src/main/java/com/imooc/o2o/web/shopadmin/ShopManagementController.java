@@ -10,9 +10,8 @@ import com.imooc.o2o.enums.ShopStateEnum;
 import com.imooc.o2o.service.AreaService;
 import com.imooc.o2o.service.ShopCategoryService;
 import com.imooc.o2o.service.ShopService;
+import com.imooc.o2o.util.CodeUtil;
 import com.imooc.o2o.util.HttpServletRequestUtil;
-import com.imooc.o2o.util.ImageUtil;
-import com.imooc.o2o.util.PathUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +78,13 @@ public class ShopManagementController {
          * 1.接收浏览器请求，转换提交上来的shop和img信息为对象，给shop实体类
          */
         Map<String, Object> modelMap = new HashMap<String, Object>();
+
+        // 验证码
+        if (!CodeUtil.checkVerifyCode(httpServletRequest)) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "输入了错误的验证码");
+            return modelMap;
+        }
 
         // 接收String
         String shopStr = HttpServletRequestUtil.getString(httpServletRequest, "shopStr");
