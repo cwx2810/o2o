@@ -79,5 +79,23 @@ public class ImageUtil {
         }
     }
 
+    /**
+     * 删除文件或目录，如果是文件地址，则删除文件，如果是目录，则删除目录的所有文件
+     * @param targetAddress
+     */
+    public static void deleteFileOrPath(String targetAddress) {
+        // 获得绝对路径
+        File fileOrPath = new File(PathUtil.getImgBasePath() + targetAddress);
+        if (fileOrPath.exists()) {
+            if (fileOrPath.isDirectory()) {
+                File files[] = fileOrPath.listFiles();
+                for (int i = 0; i < files.length; i++) {
+                    files[i].delete();
+                }
+            }
+            fileOrPath.delete();
+        }
+    }
+
 
 }

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -26,6 +25,56 @@ public class ShopServiceImpl implements ShopService {
 
     @Autowired
     private ShopDao shopDao;
+
+    /**
+     * 根据店铺id查询店铺
+     * @param shopId
+     * @return
+     */
+    @Override
+    public Shop getByShopId(long shopId) {
+        return shopDao.queryByShopId(shopId);
+    }
+
+    /**
+     * 更新店铺信息，包括对图片的处理
+     * @param shop
+     * @param shopImgInputStream
+     * @param fileName
+     * @return
+     * @throws ShopOperationException
+     */
+    @Override
+    public ShopExecution modifyShop(Shop shop, InputStream shopImgInputStream, String fileName) throws ShopOperationException {
+        if (shop == null || shop.getShopId() == null) {
+            return new ShopExecution(ShopStateEnum.NULL_SHOP);
+        } else {
+            try {
+                // 1.如果有传入图片地址，则需要改变图片地址
+                if (shopImgInputStream != null && fileName != null && !"".equals(fileName)) {
+                    // 获取表格中已经有的img，如果有，则清空
+                    if (shopDao.queryByShopId(shop.getShopId()).getShopImg() != null) {
+                        ImageUtil.deleteFileOrPath(shopDao.queryByShopId(shop.getShopId()).getShopImg());
+                    }
+                    // 增加我们设置的新的图片
+                    addShopImg(shop, shopImgInputStream, fileName);
+                }
+                // 2.更新店铺信息
+                shop.setLastEditTime(new Date());
+                // 更新操作，接收一个返回值
+                int effectedNumber = shopDao.updateShop(shop);
+                if (effectedNumber <= 0) {
+                    return new ShopExecution(ShopStateEnum.INNER_ERROR);
+                } else {
+                    // 操作成功后，将最新的信息查询一下返回给前台
+                    shop = shopDao.queryByShopId(shop.getShopId());
+                    return new ShopExecution(ShopStateEnum.SUCCESS, shop);
+                }
+            } catch (Exception e) {
+                throw new ShopOperationException("更新店铺失败：" + e.getMessage());
+            }
+        }
+    }
 
     /**
      * 添加店铺
