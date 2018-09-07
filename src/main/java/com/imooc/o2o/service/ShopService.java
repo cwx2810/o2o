@@ -4,7 +4,6 @@ import com.imooc.o2o.dto.ShopExecution;
 import com.imooc.o2o.entity.Shop;
 import com.imooc.o2o.exceptions.ShopOperationException;
 
-import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -12,6 +11,14 @@ import java.io.InputStream;
  * @create: 2018-09-04 17:56
  **/
 public interface ShopService {
+    /**
+     * 分页获得店铺列表
+     * @param shopCondition
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    ShopExecution getShopList(Shop shopCondition, int pageIndex, int pageSize);
     /**
      * 根据店铺id获取店铺
      * @param shopId
