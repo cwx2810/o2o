@@ -43,6 +43,66 @@ public class ShopManagementController {
     private AreaService areaService;
 
     /**
+     * session操作
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/getshopmanagementinfo", method = RequestMethod.GET)
+    @ResponseBody
+    private Map<String, Object> getShopManagementInfo(HttpServletRequest httpServletRequest) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        long shopId = HttpServletRequestUtil.getLong(httpServletRequest, "shopId");
+        // 没获取到shopId，去找session中的shop对象
+        if (shopId <= 0) {
+            Object currentShopObject = httpServletRequest.getSession().getAttribute("currentShop");
+            // 没有当前shop对象，跳转回shap列表
+            if (currentShopObject == null) {
+                modelMap.put("redirect", true);
+                modelMap.put("url", "o2o/shop/shoplist");
+            } else {// 有当前shop对象，设置shopId为这个对象的shopId
+                Shop currentShop = (Shop)currentShopObject;
+                modelMap.put("redirect", false);
+                modelMap.put("shopId", currentShop.getShopId());
+            }
+        } else {// 获取到了shopId，设置shop对象到session中
+            Shop currentShop = new Shop();
+            currentShop.setShopId(shopId);
+            httpServletRequest.getSession().setAttribute("currentShop", currentShop);
+            modelMap.put("redirect", false);
+        }
+        return modelMap;
+    }
+    /**
+     * 获取某个用户的店铺列表
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/getshoplist", method = RequestMethod.GET)
+    @ResponseBody
+    private Map<String, Object> getShopList(HttpServletRequest httpServletRequest) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        // 模拟用户登录，把信息保存进session
+        PersonInfo user = new PersonInfo();
+        user.setUserId(1L);
+        user.setName("test");
+        httpServletRequest.getSession().setAttribute("user", user);
+        // 模拟从session中取得用户信息
+        user = (PersonInfo) httpServletRequest.getSession().getAttribute("user");
+
+        try {
+            Shop shopCondition = new Shop();
+            shopCondition.setOwner(user);
+            ShopExecution shopExecution = shopService.getShopList(shopCondition, 0, 100);
+            modelMap.put("shopList", shopExecution.getShopList());
+            modelMap.put("user", user);
+            modelMap.put("success", true);
+        } catch (Exception e) {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", e.getMessage());
+        }
+        return modelMap;
+    }
+    /**
      * 获取店铺，根据店铺id
      * @param httpServletRequest
      * @return
