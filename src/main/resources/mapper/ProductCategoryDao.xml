@@ -3,6 +3,8 @@
 
 <mapper namespace="com.imooc.o2o.dao.ProductCategoryDao">
     <select id="queryProductCategoryList" resultType="com.imooc.o2o.entity.ProductCategory" parameterType="Long">
-        SELECT * FROM tb_product_category WHERE shop_id=#{shopId}
+        SELECT * FROM tb_product_category
+        WHERE shop_id=#{shopId}
+        ORDER BY priority DESC
     </select>
 </mapper>
