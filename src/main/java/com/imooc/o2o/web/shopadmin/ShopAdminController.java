@@ -21,4 +21,14 @@ public class ShopAdminController {
         // 视图解析器上下文我们已经定义过了，所以前面不用写路径文件夹，后面也不用带.html
         return "shop/shopoperation";
     }
+
+    /**
+     * 跳转到店铺列表
+     * @return
+     */
+    @RequestMapping(value = "/shoplist", method = RequestMethod.GET)
+    public String shopList() {
+        // 视图解析器上下文我们已经定义过了，所以前面不用写路径文件夹，后面也不用带.html
+        return "shop/shoplist";
+    }
 }
