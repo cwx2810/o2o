@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @create: 2018-09-05 17:59
  **/
 @Controller
-@RequestMapping("/shopadmin")
+@RequestMapping(value = "/shopadmin", method = RequestMethod.GET)
 public class ShopAdminController {
 
     /**
      * 跳转到店铺操作
      * @return
      */
-    @RequestMapping(value = "/shopoperation", method = RequestMethod.GET)
+    @RequestMapping(value = "/shopoperation")
     public String shopOperation() {
         // 视图解析器上下文我们已经定义过了，所以前面不用写路径文件夹，后面也不用带.html
         return "shop/shopoperation";
@@ -26,9 +26,19 @@ public class ShopAdminController {
      * 跳转到店铺列表
      * @return
      */
-    @RequestMapping(value = "/shoplist", method = RequestMethod.GET)
+    @RequestMapping(value = "/shoplist")
     public String shopList() {
         // 视图解析器上下文我们已经定义过了，所以前面不用写路径文件夹，后面也不用带.html
         return "shop/shoplist";
+    }
+
+    /**
+     * 跳转到店铺管理
+     * @return
+     */
+    @RequestMapping(value = "/shopmanage")
+    public String shopManage() {
+        // 视图解析器上下文我们已经定义过了，所以前面不用写路径文件夹，后面也不用带.html
+        return "shop/shopmanage";
     }
 }

@@ -35,7 +35,7 @@ $(function () {
 	// 生成一个链接，我们点击进入，就能进入相应的店铺管理页面
 	function goShop(status, id) {
 		if (status != 0 && status != -1) {
-			return '<a href="/o2o/shop/shopmanage?shopId='+ id +'">进入</a>';
+			return '<a href="/o2o/shopadmin/shopmanage?shopId='+ id +'">进入</a>';
 		} else {
 			return '';
 		}

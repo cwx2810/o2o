@@ -55,10 +55,10 @@ public class ShopManagementController {
         // 没获取到shopId，去找session中的shop对象
         if (shopId <= 0) {
             Object currentShopObject = httpServletRequest.getSession().getAttribute("currentShop");
-            // 没有当前shop对象，跳转回shap列表
+            // 没有当前shop对象，跳转回shop列表
             if (currentShopObject == null) {
                 modelMap.put("redirect", true);
-                modelMap.put("url", "o2o/shop/shoplist");
+                modelMap.put("url", "/o2o/shopadmin/shoplist");
             } else {// 有当前shop对象，设置shopId为这个对象的shopId
                 Shop currentShop = (Shop)currentShopObject;
                 modelMap.put("redirect", false);
