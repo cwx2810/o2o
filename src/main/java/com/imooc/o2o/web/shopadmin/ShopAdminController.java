@@ -41,4 +41,14 @@ public class ShopAdminController {
         // 视图解析器上下文我们已经定义过了，所以前面不用写路径文件夹，后面也不用带.html
         return "shop/shopmanage";
     }
+
+    /**
+     * 跳转到店铺管理中的商品类别管理
+     * @return
+     */
+    @RequestMapping(value = "/productcategorymanage")
+    public String productCategoryManage() {
+        // 视图解析器上下文我们已经定义过了，所以前面不用写路径文件夹，后面也不用带.html
+        return "shop/productcategorymanage";
+    }
 }
