@@ -5,6 +5,7 @@ $(function () {
 
     getList();
 
+    // 页面加载list
     function getList() {
         $.getJSON(listUrl, function (data) {
             if (data.success) {
@@ -29,7 +30,7 @@ $(function () {
             }
         });
     }
-
+    // 添加新条目
     $('#new')
         .click(
             function () {
@@ -40,7 +41,7 @@ $(function () {
                     + '</div>';
                 $('.category-wrap').append(tempHtml);
             });
-
+    // 提交
     $('#submit').click(function () {
         var tempArr = $('.temp');
         var productCategoryList = [];
@@ -67,7 +68,7 @@ $(function () {
             }
         });
     });
-
+    // 删除绑定已经有的条目
     $('.category-wrap').on('click', '.row-product-category.now .delete',
         function (e) {
             var target = e.currentTarget;
@@ -77,7 +78,6 @@ $(function () {
                     type: 'POST',
                     data: {
                         productCategoryId: target.dataset.id,
-                        shopId: shopId
                     },
                     dataType: 'json',
                     success: function (data) {
@@ -91,7 +91,7 @@ $(function () {
                 });
             });
         });
-
+    // 删除绑定新添加的条目
     $('.category-wrap').on('click', '.row-product-category.temp .delete',
         function (e) {
             console.log($(this).parent().parent());

@@ -102,6 +102,44 @@ public class ProductCategoryManageController {
         return modelMap;
     }
 
+    /**
+     * 删除商品类别
+     * @param productCategoryId
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/removeproductcategory", method = RequestMethod.POST)
+    @ResponseBody
+    private Map<String, Object> removeProductCategory(
+            Long productCategoryId,
+            HttpServletRequest httpServletRequest) {
+        // 返回集
+        Map<String, Object> modelMap = new HashMap<String, Object>();
 
+        // 边界检查
+        if (productCategoryId != null && productCategoryId > 0) {
+            try {
+                Shop currentShop = (Shop) httpServletRequest.getSession().getAttribute("currentShop");
+                // 删除操作
+                ProductCategoryExecution productCategoryExecution =
+                        productCategoryService.deleteProductCategory(productCategoryId, currentShop.getShopId());
+                // 删除后得到的结果是成功的好说，如果不成功，返回错误原因
+                if (productCategoryExecution.getState() == ProductCategoryStateEnum.SUCCESS.getState()) {
+                    modelMap.put("success", true);
+                } else {
+                    modelMap.put("success", false);
+                    modelMap.put("errMsg", productCategoryExecution.getStateInfo());
+                }
+            } catch (Exception e) {
+                modelMap.put("success", false);
+                modelMap.put("errMsg", e.getMessage());// 捕获异常
+                return modelMap;
+            }
+        } else {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "请选择要删除的商品分类");
+        }
+        return modelMap;
+    }
 
 }
