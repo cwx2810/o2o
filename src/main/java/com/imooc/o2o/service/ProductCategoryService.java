@@ -28,4 +28,15 @@ public interface ProductCategoryService {
     ProductCategoryExecution batchAddProductCategory(
             List<ProductCategory> productCategoryList)
             throws ProductCategoryException;
+
+    /**
+     * 删除商品分类
+     * @param productCategoryId
+     * @param shopId
+     * @return
+     * @throws ProductCategoryException
+     */
+    ProductCategoryExecution deleteProductCategory(
+            long productCategoryId, long shopId)
+            throws ProductCategoryException;
 }

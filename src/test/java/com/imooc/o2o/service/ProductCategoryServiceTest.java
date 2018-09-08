@@ -52,4 +52,18 @@ public class ProductCategoryServiceTest extends BaseTest {
                 productCategoryService.batchAddProductCategory(productCategoryList);
         assertEquals(1, productCategoryExecution.getState());
     }
+
+    @Test
+    public void testDeleteProductCategory() {
+        long shopId = 1;
+        List<ProductCategory> productCategoryList = productCategoryService.getProductCategoryList(shopId);
+        for (ProductCategory productCategory : productCategoryList) {
+            if ("商品类别5".equals(productCategory.getProductCategoryName()) ||
+                "商品类别6".equals(productCategory.getProductCategoryName())) {
+                ProductCategoryExecution productCategoryExecution =
+                        productCategoryService.deleteProductCategory(productCategory.getProductCategoryId(), shopId);
+                assertEquals(1, productCategoryExecution.getState());
+            }
+        }
+    }
 }
