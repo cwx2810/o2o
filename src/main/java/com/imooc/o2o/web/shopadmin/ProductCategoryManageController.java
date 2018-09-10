@@ -39,9 +39,9 @@ public class ProductCategoryManageController {
     private Result<List<ProductCategory>> getProductCategoryList(HttpServletRequest httpServletRequest) {
 
         // 模拟session
-        Shop shop = new Shop();
-        shop.setShopId(1L);
-        httpServletRequest.getSession().setAttribute("currentShop", shop);
+        //Shop shop = new Shop();
+        //shop.setShopId(1L);
+        //httpServletRequest.getSession().setAttribute("currentShop", shop);
 
         // 获取自己模拟的塞进去的session
         Shop currentShop = (Shop) httpServletRequest.getSession().getAttribute("currentShop");
