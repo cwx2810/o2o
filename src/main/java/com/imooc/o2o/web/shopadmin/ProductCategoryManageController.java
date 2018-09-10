@@ -5,7 +5,6 @@ import com.imooc.o2o.dto.Result;
 import com.imooc.o2o.entity.ProductCategory;
 import com.imooc.o2o.entity.Shop;
 import com.imooc.o2o.enums.ProductCategoryStateEnum;
-import com.imooc.o2o.exceptions.ProductCategoryException;
 import com.imooc.o2o.service.ProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -1,10 +1,10 @@
 package com.imooc.o2o.util;
 
+import com.imooc.o2o.dto.ImageHolder;
 import net.coobird.thumbnailator.Thumbnails;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -25,15 +25,14 @@ public class ImageUtil {
 
     /**
      * 生成缩略图
-     * @param thumbnailInputStream spring传入的图片文件
-     * @param fileName 图片的名称
+     * @param thumbnail spring传入的图片文件
      * @param targetAddress 图片保存地址，是服务器图片目录之后的地址，
      *                      也就是设置好服务器图片目录，我们这个是此目录下的相对路径
      * @return
      */
-    public static String generateThumbnail(InputStream thumbnailInputStream, String fileName, String targetAddress) throws IOException {
+    public static String generateThumbnail(ImageHolder thumbnail, String targetAddress) throws IOException {
         String realFileName = getRandomFileName();
-        String extensionName = getExtensionName(fileName);
+        String extensionName = getExtensionName(thumbnail.getImageName());
         makeDirPath(targetAddress);
         System.out.println("打印相对路径：" + targetAddress + realFileName + extensionName);
 
@@ -41,8 +40,32 @@ public class ImageUtil {
         File dest = new File(PathUtil.getImgBasePath() + targetAddress + realFileName + extensionName);
         System.out.println("打印绝对路径：" + PathUtil.getImgBasePath() + targetAddress + realFileName + extensionName);
         System.out.println("打印类加载路径：" + bathPath);
-        Thumbnails.of(thumbnailInputStream)
+        Thumbnails.of(thumbnail.getImage())
                 .size(200, 200)
+                .outputQuality(0.8f)
+                .toFile(dest);
+        return targetAddress + realFileName + extensionName;
+    }
+
+    /**
+     * 生成正常大小图片
+     * @param thumbnail spring传入的图片文件
+     * @param targetAddress 图片保存地址，是服务器图片目录之后的地址，
+     *                      也就是设置好服务器图片目录，我们这个是此目录下的相对路径
+     * @return
+     */
+    public static String generateNormalImg(ImageHolder thumbnail, String targetAddress) throws IOException {
+        String realFileName = getRandomFileName();
+        String extensionName = getExtensionName(thumbnail.getImageName());
+        makeDirPath(targetAddress);
+        System.out.println("打印相对路径：" + targetAddress + realFileName + extensionName);
+
+        // 图片文件最终存储地址
+        File dest = new File(PathUtil.getImgBasePath() + targetAddress + realFileName + extensionName);
+        System.out.println("打印绝对路径：" + PathUtil.getImgBasePath() + targetAddress + realFileName + extensionName);
+        System.out.println("打印类加载路径：" + bathPath);
+        Thumbnails.of(thumbnail.getImage())
+                .size(337, 640)
                 .outputQuality(0.8f)
                 .toFile(dest);
         return targetAddress + realFileName + extensionName;

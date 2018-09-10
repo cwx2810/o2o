@@ -4,7 +4,7 @@ import com.imooc.o2o.dao.ProductCategoryDao;
 import com.imooc.o2o.dto.ProductCategoryExecution;
 import com.imooc.o2o.entity.ProductCategory;
 import com.imooc.o2o.enums.ProductCategoryStateEnum;
-import com.imooc.o2o.exceptions.ProductCategoryException;
+import com.imooc.o2o.exceptions.ProductCategoryOperationException;
 import com.imooc.o2o.service.ProductCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,26 +36,26 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
      * 批量插入商品的商品分类
      * @param productCategoryList
      * @return
-     * @throws ProductCategoryException
+     * @throws ProductCategoryOperationException
      */
     @Override
     @Transactional
     public ProductCategoryExecution batchAddProductCategory(
             List<ProductCategory> productCategoryList)
-            throws ProductCategoryException {
+            throws ProductCategoryOperationException {
         // 商品分类列表不空，还能获取到
         if (productCategoryList != null && productCategoryList.size() > 0) {
             try {
                 // 获取一下，返回影响行数
                 int effectedNumber = productCategoryDao.batchInsertProductCategory(productCategoryList);
                 if (effectedNumber <= 0) {
-                    throw new ProductCategoryException("商品类别创建失败，合法行数小于0");
+                    throw new ProductCategoryOperationException("商品类别创建失败，合法行数小于0");
                 } else {
                     // 影响行数合法，返回成功提示
                     return new ProductCategoryExecution(ProductCategoryStateEnum.SUCCESS);
                 }
             } catch (Exception e) {
-                throw new ProductCategoryException("商品类别创建错误：" + e.getMessage());
+                throw new ProductCategoryOperationException("商品类别创建错误：" + e.getMessage());
             }
         } else {
             // 商品分类列表为空，获取不到，返回空
@@ -69,21 +69,21 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
      * @param productCategoryId
      * @param shopId
      * @return
-     * @throws ProductCategoryException
+     * @throws ProductCategoryOperationException
      */
     @Override
     @Transactional
-    public ProductCategoryExecution deleteProductCategory(long productCategoryId, long shopId) throws ProductCategoryException {
+    public ProductCategoryExecution deleteProductCategory(long productCategoryId, long shopId) throws ProductCategoryOperationException {
         // TODO 将此商品类别下的商品的类别id设置为空，再删除
         try {
             int effectedNumber = productCategoryDao.deleteProductCategory(productCategoryId, shopId);
             if(effectedNumber <= 0) {
-                throw new ProductCategoryException("删除失败");
+                throw new ProductCategoryOperationException("删除失败");
             } else {
                 return new ProductCategoryExecution(ProductCategoryStateEnum.SUCCESS);
             }
         } catch (Exception e) {
-            throw new ProductCategoryException("删除发生错误：" + e.getMessage());
+            throw new ProductCategoryOperationException("删除发生错误：" + e.getMessage());
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.imooc.o2o.web.shopadmin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.imooc.o2o.dto.ImageHolder;
 import com.imooc.o2o.dto.ShopExecution;
 import com.imooc.o2o.entity.Area;
 import com.imooc.o2o.entity.PersonInfo;
@@ -218,7 +219,9 @@ public class ShopManagementController {
             // 将shop信息和文件添加到结果集进行判断
             ShopExecution shopExecution;
             try {
-                shopExecution = shopService.addShop(shop, shopImg.getInputStream(), shopImg.getOriginalFilename());
+
+                ImageHolder imageHolder = new ImageHolder(shopImg.getOriginalFilename(), shopImg.getInputStream());
+                shopExecution = shopService.addShop(shop, imageHolder);
 
                 // 如果结果集的状态是待审核，则添加成功
                 if (shopExecution.getState() == ShopStateEnum.CHECK.getState()) {
@@ -308,9 +311,10 @@ public class ShopManagementController {
             try {
                 // 传入的图片为空也行，因为是修改，我们可以不用改图片
                 if (shopImg == null) {
-                    shopExecution = shopService.modifyShop(shop, null, null);
+                    shopExecution = shopService.modifyShop(shop, null);
                 } else {
-                    shopExecution = shopService.modifyShop(shop, shopImg.getInputStream(), shopImg.getOriginalFilename());
+                    ImageHolder imageHolder = new ImageHolder(shopImg.getOriginalFilename(), shopImg.getInputStream());
+                    shopExecution = shopService.modifyShop(shop, imageHolder);
                 }
 
                 // 如果结果集的状态是待审核，则添加成功
