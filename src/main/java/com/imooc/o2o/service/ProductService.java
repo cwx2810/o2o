@@ -15,6 +15,14 @@ import java.util.List;
 public interface ProductService {
 
     /**
+     * 分页查询商品列表
+     * @param productCondition
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    ProductExecution getProductList(Product productCondition, int pageIndex, int pageSize);
+    /**
      * 根据商品Id获取商品
      * @param ProductId
      * @return
