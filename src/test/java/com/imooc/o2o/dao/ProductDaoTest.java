@@ -3,11 +3,14 @@ package com.imooc.o2o.dao;
 import com.imooc.o2o.BaseTest;
 import com.imooc.o2o.entity.Product;
 import com.imooc.o2o.entity.ProductCategory;
+import com.imooc.o2o.entity.ProductImg;
 import com.imooc.o2o.entity.Shop;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,6 +22,41 @@ public class ProductDaoTest extends BaseTest {
 
     @Autowired
     private ProductDao productDao;
+    @Autowired
+    private ProductImgDao productImgDao;
+
+    @Test
+    public void testQueryProductByProductId() {
+        // 新建两张图片给productId=1的商品
+        ProductImg productImg1 = new ProductImg();
+        productImg1.setImgAddr("图片1");
+        productImg1.setImgDesc("测试图片");
+        productImg1.setCreateTime(new Date());
+        productImg1.setPriority(1);
+        productImg1.setProductId(1L);
+
+        ProductImg productImg2 = new ProductImg();
+        productImg2.setImgDesc("测试图片");
+        productImg2.setImgAddr("图片2");
+        productImg2.setPriority(2);
+        productImg2.setCreateTime(new Date());
+        productImg2.setProductId(1L);
+
+        List<ProductImg> productImgList = new ArrayList<ProductImg>();
+        productImgList.add(productImg1);
+        productImgList.add(productImg2);
+
+        int effectedNumber = productImgDao.batchInsertProductImg(productImgList);
+        assertEquals(2, effectedNumber);
+
+        // 查询productId=1的商品信息并校验详情图是否为2个
+        Product product = productDao.queryProductById(1L);
+        assertEquals(2, product.getProductImgList().size());
+
+        // 删除刚刚添加的详情图
+        effectedNumber = productImgDao.deleteProductImgByProductId(1L);
+        assertEquals(2, effectedNumber);
+    }
 
     @Test
     public void testInsertProduct() {
@@ -67,6 +105,24 @@ public class ProductDaoTest extends BaseTest {
         assertEquals(1, effectedNumber);
 
         effectedNumber = productDao.insertProduct(product3);
+        assertEquals(1, effectedNumber);
+    }
+
+    @Test
+    public void testUpdateProduct() {
+        Shop shop = new Shop();
+        ProductCategory productCategory = new ProductCategory();
+        shop.setShopId(1L);
+        productCategory.setProductCategoryId(2L);
+
+        Product product = new Product();
+        product.setProductId(1L);
+        product.setShop(shop);
+        product.setProductCategory(productCategory);
+
+        // 修改1号商铺，2号商品分类的商品名称
+        product.setProductName("测试修改商品");
+        int effectedNumber = productDao.updateProduct(product);
         assertEquals(1, effectedNumber);
     }
 }

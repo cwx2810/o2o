@@ -16,4 +16,11 @@ public interface ProductImgDao {
      * @return 插入了多少行图片
      */
     int batchInsertProductImg(List<ProductImg> productImgList);
+
+    /**
+     * 根据商品id删除该商品所有详情图
+     * @param ProductId
+     * @return 返回影响的行数
+     */
+    int deleteProductImgByProductId(long ProductId);
 }

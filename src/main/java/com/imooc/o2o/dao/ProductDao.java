@@ -8,11 +8,25 @@ import com.imooc.o2o.entity.Product;
  **/
 public interface ProductDao {
 
+
+    /**
+     * 通过productId查询商品
+     * @param productId
+     * @return
+     */
+    Product queryProductById(long productId);
     /**
      * 插入商品
      * @param product
      * @return
      */
     int insertProduct(Product product);
+
+    /**
+     * 修改商品
+     * @param product
+     * @return 返回影响的行数
+     */
+    int updateProduct(Product product);
 
 }
