@@ -26,6 +26,28 @@ public class ProductDaoTest extends BaseTest {
     private ProductImgDao productImgDao;
 
     @Test
+    public void testQueryProductList() throws Exception {
+
+        Product product = new Product();
+        // 返回3条数据
+        List<Product> productList = productDao.queryProductList(product, 0, 3);
+        assertEquals(3, productList.size());
+
+        // 返回总商品数
+        int count = productDao.queryProductCount(product);
+        assertEquals(7, count);
+
+        // 模糊查询“测试”
+        product.setProductName("测试");
+        productList = productDao.queryProductList(product, 0, 3);
+        assertEquals(3, productList.size());
+
+        count = productDao.queryProductCount(product);
+        assertEquals(3, count);
+
+    }
+
+    @Test
     public void testQueryProductByProductId() {
         // 新建两张图片给productId=1的商品
         ProductImg productImg1 = new ProductImg();

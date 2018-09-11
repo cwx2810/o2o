@@ -1,6 +1,9 @@
 package com.imooc.o2o.dao;
 
 import com.imooc.o2o.entity.Product;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author: LieutenantChen
@@ -8,7 +11,23 @@ import com.imooc.o2o.entity.Product;
  **/
 public interface ProductDao {
 
+    /**
+     * 分页查询商品列表
+     * @param productCondition
+     * @param rowIndex
+     * @param pageSize
+     * @return
+     */
+    List<Product> queryProductList(@Param("productCondition") Product productCondition,
+                                   @Param("rowIndex") int rowIndex,
+                                   @Param("pageSize") int pageSize);
 
+    /**
+     * 查询商品总数，是分页的支持方法
+     * @param productCondition
+     * @return
+     */
+    int queryProductCount(@Param("productCondition") Product productCondition);
     /**
      * 通过productId查询商品
      * @param productId
