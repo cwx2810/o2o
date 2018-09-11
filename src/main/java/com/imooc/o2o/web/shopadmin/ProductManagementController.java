@@ -44,6 +44,42 @@ public class ProductManagementController {
     // 支持商品详情图最大上传数量
     private static final int IMAGE_MAX_COUNT = 6;
 
+
+    /**
+     * 分页查询商品信息
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/getproductlistbyshop", method = RequestMethod.GET)
+    @ResponseBody
+    private Map<String, Object> getProductListByShop(HttpServletRequest request) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        // 获取前台传过来的页码
+        int pageIndex = HttpServletRequestUtil.getInt(request, "pageIndex");
+        // 获取前台传过来的每页要求返回的商品数上限
+        int pageSize = HttpServletRequestUtil.getInt(request, "pageSize");
+        // 获取session
+        Shop currentShop = (Shop) request.getSession().getAttribute("currentShop");
+        // 边界检查
+        if ((pageIndex > -1) && (pageSize > -1) && (currentShop != null) && (currentShop.getShopId() != null)) {
+            // 获取传入的需要检索的条件
+            long productCategoryId = HttpServletRequestUtil.getLong(request, "productCategoryId");
+            String productName = HttpServletRequestUtil.getString(request, "productName");
+            // 计算出真正查询的条件
+            Product productCondition =
+                    compactProductCondition4Search(currentShop.getShopId(), productCategoryId, productName);
+            // 执行查询
+            ProductExecution pe = productService.getProductList(productCondition, pageIndex, pageSize);
+            // 封装结果
+            modelMap.put("productList", pe.getProductList());
+            modelMap.put("count", pe.getCount());
+            modelMap.put("success", true);
+        } else {
+            modelMap.put("success", false);
+            modelMap.put("errMsg", "empty pageSize or pageIndex or shopId");
+        }
+        return modelMap;
+    }
     /**
      * 通过商品Id获取商品信息
      * @param productId
@@ -178,16 +214,12 @@ public class ProductManagementController {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(
                 httpServletRequest.getSession().getServletContext());
         /**
-         * 添加详情图
+         * 更改详情图
          */
         try {
             // 请求中存在文件流，则取出
             if (multipartResolver.isMultipart(httpServletRequest)) {
                 thumbnail = handleImg((MultipartHttpServletRequest) httpServletRequest, productImgList);
-            } else {
-                modelMap.put("success", false);
-                modelMap.put("errMsg", "上传图片不能为空");
-                return modelMap;
             }
         } catch (Exception e) {
             modelMap.put("success", false);
@@ -196,7 +228,7 @@ public class ProductManagementController {
         }
 
         /**
-         * 添加商品
+         * 更新商品
          */
         try {
             String productStr = HttpServletRequestUtil.getString(httpServletRequest, "productStr");
@@ -214,7 +246,7 @@ public class ProductManagementController {
                 Shop currentShop = (Shop) httpServletRequest.getSession().getAttribute("currentShop");
                 product.setShop(currentShop);
 
-                // 执行添加操作
+                // 执行更改操作
                 ProductExecution pe = productService.modifyProduct(product, thumbnail, productImgList);
                 if (pe.getState() == ProductStateEnum.SUCCESS.getState()) {
                     modelMap.put("success", true);
@@ -244,11 +276,14 @@ public class ProductManagementController {
      */
     private ImageHolder handleImg(MultipartHttpServletRequest httpServletRequest, List<ImageHolder> productImgList) throws IOException {
         MultipartHttpServletRequest multipartRequest;
-        ImageHolder thumbnail;
+        ImageHolder thumbnail = null;
         multipartRequest = httpServletRequest;
+
         // 从文件流取出缩略图并构建ImageHolder对象
         CommonsMultipartFile thumbnailFile = (CommonsMultipartFile) multipartRequest.getFile("thumbnail");
-        thumbnail = new ImageHolder(thumbnailFile.getOriginalFilename(), thumbnailFile.getInputStream());
+        if (thumbnailFile != null) {
+            thumbnail = new ImageHolder(thumbnailFile.getOriginalFilename(), thumbnailFile.getInputStream());
+        }
 
         // 取出详情图。构建列表
         for (int i = 0; i < IMAGE_MAX_COUNT; i++) {
@@ -264,6 +299,33 @@ public class ProductManagementController {
             }
         }
         return thumbnail;
+    }
+
+
+    /**
+     * 组合查询条件
+     * @param shopId
+     * @param productCategoryId
+     * @param productName
+     * @return
+     */
+    private Product compactProductCondition4Search(long shopId, long productCategoryId, String productName) {
+        // 初始化商品查询条件
+        Product productCondition = new Product();
+        Shop shop = new Shop();
+        shop.setShopId(shopId);
+        productCondition.setShop(shop);
+        // 如果要按类别查询，整合进去
+        if (productCategoryId != -1L) {
+            ProductCategory productCategory = new ProductCategory();
+            productCategory.setProductCategoryId(productCategoryId);
+            productCondition.setProductCategory(productCategory);
+        }
+        // 如果要按商品名查询，整合进去
+        if (!productName.equals("null") && productName != null) {
+            productCondition.setProductName(productName);
+        }
+        return productCondition;
     }
 
 

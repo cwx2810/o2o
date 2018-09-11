@@ -28,6 +28,19 @@ public class ProductServiceTest extends BaseTest {
     private ProductService productService;
 
     @Test
+    public void testGetShopList() {
+        Product productCondition = new Product();
+        ProductCategory productCategory = new ProductCategory();
+        productCategory.setProductCategoryId(2L);
+        productCondition.setProductCategory(productCategory);
+
+        ProductExecution productExecution = productService.getProductList(productCondition, 1, 3);
+        System.out.println("2号分类店铺列表每页数量之第一页：" + productExecution.getProductList().size());
+        System.out.println("2号分类总店铺数" + productExecution.getCount());
+
+    }
+
+    @Test
     public void testAddProduct() throws ShopOperationException, IOException {
         Shop shop = new Shop();
         ProductCategory productCategory = new ProductCategory();
