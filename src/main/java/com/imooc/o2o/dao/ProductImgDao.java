@@ -10,6 +10,13 @@ import java.util.List;
  **/
 public interface ProductImgDao {
 
+
+    /**
+     * 根据产品id查询产品详情图列表
+     * @param productId
+     * @return
+     */
+    List<ProductImg> queryProductImgList(long productId);
     /**
      * 批量添加商品图片
      * @param productImgList

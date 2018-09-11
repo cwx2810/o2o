@@ -62,4 +62,38 @@ public class ProductServiceTest extends BaseTest {
         assertEquals(ProductStateEnum.SUCCESS.getState(), productExecution.getState());
     }
 
+    @Test
+    public void testUpdateProduct() throws ShopOperationException, IOException {
+        Shop shop = new Shop();
+        ProductCategory productCategory = new ProductCategory();
+
+        shop.setShopId(1L);
+        productCategory.setProductCategoryId(2L);
+
+        Product product = new Product();
+        product.setProductId(1L);
+        product.setShop(shop);
+        product.setProductCategory(productCategory);
+        product.setProductName("正式的商品");
+        product.setProductDesc("正式的商品描述");
+        product.setEnableStatus(ProductStateEnum.SUCCESS.getState());
+
+        // 创建缩略图
+        File file = new File("C:/images/git.jpg");
+        InputStream inputStream = new FileInputStream(file);
+        ImageHolder thumbnail = new ImageHolder(file.getName(), inputStream);
+
+        // 创建两张详情图
+        File productImg1 = new File("C:/images/hetian.jpg");
+        InputStream inputStream1 = new FileInputStream(productImg1);
+        File productImg2 = new File("C:/images/test.jpg");
+        InputStream inputStream2 = new FileInputStream(productImg2);
+        List<ImageHolder> productImgList = new ArrayList<ImageHolder>();
+        productImgList.add(new ImageHolder(productImg1.getName(), inputStream1));
+        productImgList.add(new ImageHolder(productImg2.getName(), inputStream2));
+        //添加商品
+        ProductExecution productExecution = productService.modifyProduct(product, thumbnail, productImgList);
+        assertEquals(ProductStateEnum.SUCCESS.getState(), productExecution.getState());
+    }
+
 }

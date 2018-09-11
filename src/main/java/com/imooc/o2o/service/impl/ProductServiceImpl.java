@@ -36,6 +36,16 @@ public class ProductServiceImpl implements ProductService {
 
 
     /**
+     * 通过商品Id查询商品
+     * @param ProductId
+     * @return
+     */
+    @Override
+    public Product getProductById(long ProductId) {
+        return productDao.queryProductById(ProductId);
+    }
+
+    /**
      * 添加商品信息及图片处理
      * @param product
      * @param thumbnail
@@ -72,6 +82,58 @@ public class ProductServiceImpl implements ProductService {
                 addProductImgList(product, productImgHolderList);
             }
             // 返回添加成功
+            return new ProductExecution(ProductStateEnum.SUCCESS, product);
+        }
+        // 边界检查失败
+        return new ProductExecution(ProductStateEnum.EMPTY);
+    }
+
+    /**
+     * 修改商品
+     * @param product
+     * @param thumbnail
+     * @param productImgHolderList
+     * @return
+     * @throws ProductOperationException
+     * @throws IOException
+     */
+    @Override
+    @Transactional
+    public ProductExecution modifyProduct(
+            Product product, ImageHolder thumbnail,
+            List<ImageHolder> productImgHolderList) throws ProductOperationException, IOException {
+        // 边界检查
+        if (product != null && product.getShop() != null && product.getShop().getShopId() != null) {
+            // 设置默认属性
+            product.setLastEditTime(new Date());
+            // 缩略图不为空则添加
+            if (thumbnail != null) {
+                // 先获取并删除原来有的图
+                Product tempProduct = productDao.queryProductById(product.getProductId());
+                if (tempProduct.getImgAddr() != null) {
+                    ImageUtil.deleteFileOrPath(tempProduct.getImgAddr());
+                }
+                // 添加新的图
+                addThumbnail(product ,thumbnail);
+            }
+            // 详情图不为空则添加
+            if (productImgHolderList != null && productImgHolderList.size() > 0) {
+                // 先删除原先的
+                deleteProductImgList(product.getProductId());
+                // 添加新的详情图
+                addProductImgList(product, productImgHolderList);
+            }
+            // 添加商品
+            try {
+                int effectedNumber = productDao.updateProduct(product);
+                if (effectedNumber <= 0) {
+                    throw new ProductOperationException("更新商品失败");
+                }
+            } catch (Exception e) {
+                throw new ProductOperationException("更新出错：" + e.getMessage());
+            }
+
+            // 返回更新成功
             return new ProductExecution(ProductStateEnum.SUCCESS, product);
         }
         // 边界检查失败
@@ -125,6 +187,21 @@ public class ProductServiceImpl implements ProductService {
                 throw new ProductOperationException("创建错误：" + e.getMessage());
             }
         }
+    }
+
+    /**
+     * 删除某个商品下的所有详情图
+     * @param productId
+     */
+    private void deleteProductImgList(long productId) {
+        // 获取原来的图片
+        List<ProductImg> productImgList = productImgDao.queryProductImgList(productId);
+        // 干掉具体的图片
+        for (ProductImg productImg : productImgList) {
+            ImageUtil.deleteFileOrPath(productImg.getImgAddr());
+        }
+        // 删除数据库中图片信息
+        productImgDao.deleteProductImgByProductId(productId);
     }
 
 

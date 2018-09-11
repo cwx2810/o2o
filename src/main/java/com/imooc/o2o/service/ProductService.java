@@ -15,6 +15,12 @@ import java.util.List;
 public interface ProductService {
 
     /**
+     * 根据商品Id获取商品
+     * @param ProductId
+     * @return
+     */
+    Product getProductById(long ProductId);
+    /**
      * 添加商品信息及图片处理
      * @param product
      * @param thumbnail
@@ -23,6 +29,19 @@ public interface ProductService {
      * @throws ProductOperationException
      */
     ProductExecution addProduct(
+            Product product, ImageHolder thumbnail,
+            List<ImageHolder> productImgHolderList) throws ProductOperationException, IOException;
+
+    /**
+     * 修改商品信息
+     * @param product
+     * @param thumbnail
+     * @param productImgHolderList
+     * @return
+     * @throws ProductOperationException
+     * @throws IOException
+     */
+    ProductExecution modifyProduct(
             Product product, ImageHolder thumbnail,
             List<ImageHolder> productImgHolderList) throws ProductOperationException, IOException;
 }
