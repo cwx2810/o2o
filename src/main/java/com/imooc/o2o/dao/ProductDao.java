@@ -48,4 +48,11 @@ public interface ProductDao {
      */
     int updateProduct(Product product);
 
+    /**
+     * 删除商品类别之前将商品类别Id置空
+     * @param productCategoryId
+     * @return
+     */
+    int updateProductCategoryToNull(long productCategoryId);
+
 }
