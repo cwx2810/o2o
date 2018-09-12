@@ -74,10 +74,10 @@ $(function () {
                 $('.list-div').append(html);
                 var total = $('.list-div .card').length;
                 if (total >= maxItems) {
-                    // 加载完毕，则注销无限加载事件，以防不必要的加载
-                    $.detachInfiniteScroll($('.infinite-scroll'));
-                    // 删除加载提示符
-                    $('.infinite-scroll-preloader').remove();
+                    // 加载完了所有的，就隐藏加载
+                    $('.infinite-scroll-preloader').hide();
+                } else {
+                    $('.infinite-scroll-preloader').show();
                 }
                 pageNum += 1;
                 loading = false;
@@ -134,7 +134,7 @@ $(function () {
         });
 
     // 查询的店铺名字发生变化，重置
-    $('#search').on('input', function (e) {
+    $('#search').on('change', function (e) {
         shopName = e.target.value;
         $('.list-div').empty();
         pageNum = 1;

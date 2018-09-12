@@ -84,8 +84,7 @@ public class ShopManagementController {
         Map<String, Object> modelMap = new HashMap<String, Object>();
         // 模拟用户登录，把信息保存进session
         PersonInfo user = new PersonInfo();
-        user.setUserId(1L);
-        user.setName("test");
+        user.setUserId(8L);
         httpServletRequest.getSession().setAttribute("user", user);
         // 模拟从session中取得用户信息
         user = (PersonInfo) httpServletRequest.getSession().getAttribute("user");
